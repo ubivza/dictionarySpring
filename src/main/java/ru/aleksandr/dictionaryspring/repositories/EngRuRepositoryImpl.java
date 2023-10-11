@@ -1,7 +1,10 @@
 package ru.aleksandr.dictionaryspring.repositories;
 
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.aleksandr.dictionaryspring.models.EngRuDictWord;
+import ru.aleksandr.dictionaryspring.utils.EngRuDictValidator;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -13,8 +16,11 @@ public class EngRuRepositoryImpl implements EngRuRepository {
     private final Properties prop;
     private final String FILE_NAME = "src/main/resources/static/dictionary1.properties";
     private InputStream in;
+    private final EngRuDictValidator engRuDictValidator;
 
-    public EngRuRepositoryImpl() {
+    @Autowired
+    public EngRuRepositoryImpl(EngRuDictValidator engRuDictValidator) {
+        this.engRuDictValidator = engRuDictValidator;
         this.prop = new Properties();
         try {
             in = new FileInputStream(FILE_NAME);
@@ -42,6 +48,8 @@ public class EngRuRepositoryImpl implements EngRuRepository {
     public void save(String s) {
         String[] valueToSave = s.trim().split(" - ", 2);
         EngRuDictWord word = new EngRuDictWord();
+        //какой объект для помещения в него сообщений об ошибке поместить?
+        engRuDictValidator.validate(word, null);
         word.setEnglishWord(valueToSave[0]);
         word.setRuWord(valueToSave[1]);
         prop.setProperty(word.getEnglishWord(), word.getRuWord());
