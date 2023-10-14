@@ -24,12 +24,18 @@ public class EngRuView {
     }
 
     public void deleteByWord(String wordTodelete) {
-        engRuRepository.deleteByKey(wordTodelete);
-        System.out.println("Слово " + wordTodelete + " успешно удалено!" + "\n");
+        if (engRuRepository.deleteByKey(wordTodelete)) {
+            System.out.println("Слово " + wordTodelete + " успешно удалено!" + "\n");
+        } else {
+            System.out.println("Слово " + wordTodelete + " не было добавлено" + "\n");
+        }
     }
 
     public void addWord(String wordToAdd) {
-        engRuRepository.save(wordToAdd);
-        System.out.println("Слово " + wordToAdd + " успешно добавлено!" + "\n");
+        if (engRuRepository.save(wordToAdd)) {
+            System.out.println("Слово " + wordToAdd + " успешно добавлено!" + "\n");
+        } else {
+            System.out.println("Слово " + wordToAdd + " не было добавлено!" + "\n");
+        }
     }
 }

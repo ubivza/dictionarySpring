@@ -1,5 +1,6 @@
 package ru.aleksandr.dictionaryspring.repositories;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.validation.DataBinder;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Properties;
 
 @Repository
+@Slf4j
 public class SpanishRuRepositoryImpl implements SpanishRuRepository{
     private final Properties prop;
     private final String FILE_NAME = "src/main/resources/static/dictionary2.properties";
@@ -45,7 +47,7 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
         return prop.getProperty(s, "Key not found, try again");
     }
 
-    public void save(String s) {
+    public boolean save(String s) {
         String[] valueToSave = s.trim().split(" - ", 2);
         SpanishRuDictionaryWord word = new SpanishRuDictionaryWord();
         word.setSpanishWord(valueToSave[0]);
@@ -57,19 +59,21 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
         } catch (IOException e) {
             throw new RuntimeException("No such properties file found to save");
         }
+        return true;
     }
 
     public void update(String s) {
         //сделаю позже
     }
 
-    public void deleteByKey(String s) {
+    public boolean deleteByKey(String s) {
         prop.remove(s);
         try {
             prop.store(new FileOutputStream(FILE_NAME), null);
         } catch (IOException e) {
             throw new RuntimeException("No such properties file found to delete");
         }
+        return true;
     }
 
     private static void validate(SpanishRuDictionaryWord spanishRuDictionaryWord) {
@@ -78,7 +82,8 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
         dataBinder.validate();
         if (dataBinder.getBindingResult().hasErrors()) {
             System.out.println(dataBinder.getBindingResult().getAllErrors());
-            throw new RuntimeException("Validation Error");
+            log.warn("{} is not valid string", spanishRuDictionaryWord.getSpanishWord());
+            //throw new RuntimeException("Validation Error");
         }
     }
 

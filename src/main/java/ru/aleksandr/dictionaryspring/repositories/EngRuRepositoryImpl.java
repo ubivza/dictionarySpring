@@ -1,5 +1,6 @@
 package ru.aleksandr.dictionaryspring.repositories;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.validation.DataBinder;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Repository
+@Slf4j
 public class EngRuRepositoryImpl implements EngRuRepository {
     private static boolean isChanged = false;
     private final Properties prop;
@@ -54,7 +56,7 @@ public class EngRuRepositoryImpl implements EngRuRepository {
         return prop.getProperty(s, "Key not found, try again");
     }
 
-    public void save(String s) {
+    public boolean save(String s) {
         String[] valueToSave = s.trim().split(" - ", 2);
         EngRuDictWord word = new EngRuDictWord();
         word.setEnglishWord(valueToSave[0]);
@@ -64,7 +66,9 @@ public class EngRuRepositoryImpl implements EngRuRepository {
         dataBinder.validate();
         if (dataBinder.getBindingResult().hasErrors()) {
             System.out.println(dataBinder.getBindingResult().getAllErrors());
-            throw new RuntimeException("Validation Error");
+            log.warn("{} is not valid string", s);
+            return false;
+            //throw new RuntimeException("Validation Error");
         }
         prop.setProperty(word.getEnglishWord(), word.getRuWord());
         try {
@@ -73,13 +77,14 @@ public class EngRuRepositoryImpl implements EngRuRepository {
         } catch (IOException e) {
             throw new RuntimeException("No such properties file found to save");
         }
+        return true;
     }
 
     public void update(String s) {
         //сделаю позже
     }
 
-    public void deleteByKey(String s) {
+    public boolean deleteByKey(String s) {
         prop.remove(s);
         try {
             prop.store(new FileOutputStream(FILE_NAME), null);
@@ -87,6 +92,7 @@ public class EngRuRepositoryImpl implements EngRuRepository {
         } catch (IOException e) {
             throw new RuntimeException("No such properties file found to delete");
         }
+        return true;
     }
 
 }
