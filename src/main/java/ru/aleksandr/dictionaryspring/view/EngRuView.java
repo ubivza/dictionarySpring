@@ -16,6 +16,7 @@ public class EngRuView {
 
     public void show() {
         engRuRepository.getAll();
+        System.out.println();
     }
 
     public void showByWord(String word) {

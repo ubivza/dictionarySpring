@@ -1,10 +1,12 @@
 package ru.aleksandr.dictionaryspring.repositories;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.validation.DataBinder;
 import ru.aleksandr.dictionaryspring.models.SpanishRuDictionaryWord;
+import ru.aleksandr.dictionaryspring.utils.SpanishRuDictValidator;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -13,8 +15,11 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
     private final Properties prop;
     private final String FILE_NAME = "src/main/resources/static/dictionary2.properties";
     private InputStream in;
+    private static SpanishRuDictValidator spanishRuDictValidator;
 
-    public SpanishRuRepositoryImpl() {
+    @Autowired
+    public SpanishRuRepositoryImpl(SpanishRuDictValidator spanishRuDictValidator) {
+        SpanishRuRepositoryImpl.spanishRuDictValidator = spanishRuDictValidator;
         this.prop = new Properties();
         try {
             in = new FileInputStream(FILE_NAME);
@@ -30,7 +35,6 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
 
 
     public List<String> getAll() {
-        List<String> words = new ArrayList<>();
         PrintWriter ps = new PrintWriter(System.out);
         prop.list(ps);
         ps.flush();
@@ -46,6 +50,7 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
         SpanishRuDictionaryWord word = new SpanishRuDictionaryWord();
         word.setSpanishWord(valueToSave[0]);
         word.setRuWord(valueToSave[1]);
+        validate(word);
         prop.setProperty(word.getSpanishWord(), word.getRuWord());
         try {
             prop.store(new FileOutputStream(FILE_NAME), null);
@@ -64,6 +69,16 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
             prop.store(new FileOutputStream(FILE_NAME), null);
         } catch (IOException e) {
             throw new RuntimeException("No such properties file found to delete");
+        }
+    }
+
+    private static void validate(SpanishRuDictionaryWord spanishRuDictionaryWord) {
+        DataBinder dataBinder = new DataBinder(spanishRuDictionaryWord);
+        dataBinder.addValidators(spanishRuDictValidator);
+        dataBinder.validate();
+        if (dataBinder.getBindingResult().hasErrors()) {
+            System.out.println(dataBinder.getBindingResult().getAllErrors());
+            throw new RuntimeException("Validation Error");
         }
     }
 

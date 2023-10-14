@@ -1,18 +1,19 @@
 package ru.aleksandr.dictionaryspring.repositories;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.validation.DataBinder;
 import ru.aleksandr.dictionaryspring.models.EngRuDictWord;
 import ru.aleksandr.dictionaryspring.utils.EngRuDictValidator;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 @Repository
 public class EngRuRepositoryImpl implements EngRuRepository {
+    private static boolean isChanged = false;
     private final Properties prop;
     private final String FILE_NAME = "src/main/resources/static/dictionary1.properties";
     private InputStream in;
@@ -34,10 +35,18 @@ public class EngRuRepositoryImpl implements EngRuRepository {
 
 
     public List<String> getAll() {
-        List<String> words = new ArrayList<>();
-        PrintWriter ps = new PrintWriter(System.out);
-        prop.list(ps);
-        ps.flush();
+        for (Map.Entry<Object, Object> o : prop.entrySet()) {
+            System.out.println(o.getKey() + " - " + o.getValue());
+        }
+        /*if (isChanged) {
+            PrintWriter ps = new PrintWriter(System.out);
+            prop.list(ps);
+            ps.flush();
+        } else {
+            for (Map.Entry<Object, Object> o : prop.entrySet()) {
+                System.out.println(o.getKey() + " - " + o.getValue());
+            }
+        }*/
         return null;
     }
 
@@ -48,13 +57,19 @@ public class EngRuRepositoryImpl implements EngRuRepository {
     public void save(String s) {
         String[] valueToSave = s.trim().split(" - ", 2);
         EngRuDictWord word = new EngRuDictWord();
-        //какой объект для помещения в него сообщений об ошибке поместить?
-        engRuDictValidator.validate(word, null);
         word.setEnglishWord(valueToSave[0]);
         word.setRuWord(valueToSave[1]);
+        DataBinder dataBinder = new DataBinder(word);
+        dataBinder.addValidators(engRuDictValidator);
+        dataBinder.validate();
+        if (dataBinder.getBindingResult().hasErrors()) {
+            System.out.println(dataBinder.getBindingResult().getAllErrors());
+            throw new RuntimeException("Validation Error");
+        }
         prop.setProperty(word.getEnglishWord(), word.getRuWord());
         try {
             prop.store(new FileOutputStream(FILE_NAME), null);
+            isChanged = true;
         } catch (IOException e) {
             throw new RuntimeException("No such properties file found to save");
         }
@@ -68,6 +83,7 @@ public class EngRuRepositoryImpl implements EngRuRepository {
         prop.remove(s);
         try {
             prop.store(new FileOutputStream(FILE_NAME), null);
+            isChanged = true;
         } catch (IOException e) {
             throw new RuntimeException("No such properties file found to delete");
         }

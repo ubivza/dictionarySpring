@@ -1,13 +1,17 @@
 package ru.aleksandr.dictionaryspring.utils;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import ru.aleksandr.dictionaryspring.models.EngRuDictWord;
 
-@Component
+@Service
 public class EngRuDictValidator implements Validator {
-    private static String pattern = "[0-9]{5}";
+    private static final String PATTERN = "[0-9]{5}";
+    private static final String ENG_FIELD_NAME = "englishWord";
+    private static final String RU_FIELD_NAME = "ruWord";
+    private static final String ERROR_MESSAGE_BLANK = "Word shouldn't be empty";
+    private static final String ERROR_CHARACTERS_LONG = "Word must be 5 characters long and should contain only numbers";
     @Override
     public boolean supports(Class<?> clazz) {
         return EngRuDictWord.class.equals(clazz);
@@ -17,13 +21,13 @@ public class EngRuDictValidator implements Validator {
     public void validate(Object target, Errors errors) {
         EngRuDictWord engRuDictWord = (EngRuDictWord) target;
         if (engRuDictWord.getEnglishWord().isBlank()) {
-            errors.rejectValue("englishWord", "", "Word shouldn't be empty");
+            errors.rejectValue(ENG_FIELD_NAME, "", ERROR_MESSAGE_BLANK);
         }
         if (engRuDictWord.getRuWord().isBlank()) {
-            errors.rejectValue("ruWord", "", "Translate shouldn't be empty");
+            errors.rejectValue(RU_FIELD_NAME, "", ERROR_MESSAGE_BLANK);
         }
-        if (!engRuDictWord.getEnglishWord().matches(pattern)) {
-            errors.rejectValue("englishWord", "", "Word must be 5 characters long and should contain only numbers");
+        if (!engRuDictWord.getEnglishWord().matches(PATTERN)) {
+            errors.rejectValue(ENG_FIELD_NAME, "", ERROR_CHARACTERS_LONG);
         }
     }
 }

@@ -20,7 +20,7 @@ public class ApplicationRunner {
     public void runApp() {
         Scanner scanner = new Scanner(System.in);
         while (abort) {
-            System.out.println("Добро пожаловать в словарьленд! Выберите действие:");
+            System.out.println("Добро пожаловать в словарьленд! Выберите действие:" + "\n");
             System.out.println("1. Открыть Англо-Русский словарь");
             System.out.println("2. Открыть Испано-Русский словарь");
             System.out.println("3. Найти слово в Англо-Русском словаре");
