@@ -6,6 +6,6 @@ public interface GenericRepository<T, KEY> {
     List<T> getAll();
     T getByKey(KEY key);
     boolean save(T t);
-    void update(T t);
+    boolean update(T t);
     boolean deleteByKey(KEY key);
 }

@@ -20,12 +20,15 @@ public class EngRuDictValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         EngRuDictWord engRuDictWord = (EngRuDictWord) target;
+
         if (engRuDictWord.getEnglishWord().isBlank()) {
             errors.rejectValue(ENG_FIELD_NAME, "", ERROR_MESSAGE_BLANK);
         }
+
         if (engRuDictWord.getRuWord().isBlank()) {
             errors.rejectValue(RU_FIELD_NAME, "", ERROR_MESSAGE_BLANK);
         }
+
         if (!engRuDictWord.getEnglishWord().matches(PATTERN)) {
             errors.rejectValue(ENG_FIELD_NAME, "", ERROR_CHARACTERS_LONG);
         }

@@ -20,12 +20,15 @@ public class SpanishRuDictValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         SpanishRuDictionaryWord spanishRuDictionaryWord = (SpanishRuDictionaryWord) target;
+
         if (spanishRuDictionaryWord.getSpanishWord().isBlank()) {
             errors.rejectValue(SPN_FIELD_NAME, "", ERROR_MESSAGE_BLANK);
         }
+
         if (spanishRuDictionaryWord.getRuWord().isBlank()) {
             errors.rejectValue(RU_FIELD_NAME, "", ERROR_MESSAGE_BLANK);
         }
+
         if (!spanishRuDictionaryWord.getSpanishWord().matches(PATTERN)) {
             errors.rejectValue(SPN_FIELD_NAME, "", ERROR_CHARACTERS_LONG);
         }

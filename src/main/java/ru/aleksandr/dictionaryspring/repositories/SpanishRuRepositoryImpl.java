@@ -23,6 +23,7 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
     public SpanishRuRepositoryImpl(SpanishRuDictValidator spanishRuDictValidator) {
         SpanishRuRepositoryImpl.spanishRuDictValidator = spanishRuDictValidator;
         this.prop = new Properties();
+
         try {
             in = new FileInputStream(FILE_NAME);
             prop.load(in);
@@ -49,10 +50,13 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
 
     public boolean save(String s) {
         String[] valueToSave = s.trim().split(" - ", 2);
+
         SpanishRuDictionaryWord word = new SpanishRuDictionaryWord();
         word.setSpanishWord(valueToSave[0]);
         word.setRuWord(valueToSave[1]);
+
         validate(word);
+
         prop.setProperty(word.getSpanishWord(), word.getRuWord());
         try {
             prop.store(new FileOutputStream(FILE_NAME), null);
@@ -62,8 +66,9 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
         return true;
     }
 
-    public void update(String s) {
+    public boolean update(String s) {
         //сделаю позже
+        return false;
     }
 
     public boolean deleteByKey(String s) {
@@ -80,9 +85,10 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
         DataBinder dataBinder = new DataBinder(spanishRuDictionaryWord);
         dataBinder.addValidators(spanishRuDictValidator);
         dataBinder.validate();
+
         if (dataBinder.getBindingResult().hasErrors()) {
             System.out.println(dataBinder.getBindingResult().getAllErrors());
-            log.warn("{} is not valid string", spanishRuDictionaryWord.getSpanishWord());
+            log.warn("{} is not valid data to add", spanishRuDictionaryWord.getSpanishWord());
             //throw new RuntimeException("Validation Error");
         }
     }
