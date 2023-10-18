@@ -16,7 +16,6 @@ import java.util.Properties;
 public class SpanishRuRepositoryImpl implements SpanishRuRepository{
     private final Properties prop;
     private final String FILE_NAME = "src/main/resources/static/dictionary2.properties";
-    private InputStream in;
     private static SpanishRuDictValidator spanishRuDictValidator;
 
     @Autowired
@@ -24,8 +23,7 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
         SpanishRuRepositoryImpl.spanishRuDictValidator = spanishRuDictValidator;
         this.prop = new Properties();
 
-        try {
-            in = new FileInputStream(FILE_NAME);
+        try(InputStream in = new FileInputStream(FILE_NAME)) {
             prop.load(in);
         } catch (FileNotFoundException e) {
             throw new RuntimeException("No such properties file");
@@ -67,7 +65,7 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
     }
 
     public boolean update(String s) {
-        //сделаю позже
+        //в задании нет указаний, сделаю позже
         return false;
     }
 
@@ -89,7 +87,7 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
         if (dataBinder.getBindingResult().hasErrors()) {
             System.out.println(dataBinder.getBindingResult().getAllErrors());
             log.warn("{} is not valid data to add", spanishRuDictionaryWord.getSpanishWord());
-            //throw new RuntimeException("Validation Error");
+            //throw new RuntimeException("Validation Error"); - заменил на логгер
         }
     }
 

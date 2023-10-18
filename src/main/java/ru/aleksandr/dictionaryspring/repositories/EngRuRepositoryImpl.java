@@ -19,7 +19,6 @@ public class EngRuRepositoryImpl implements EngRuRepository {
     private static boolean isChanged = false;
     private final Properties prop;
     private final String FILE_NAME = "src/main/resources/static/dictionary1.properties";
-    private InputStream in;
     private final EngRuDictValidator engRuDictValidator;
     private Map<Object, Object> cacheMap = new HashMap<>();
 
@@ -27,8 +26,7 @@ public class EngRuRepositoryImpl implements EngRuRepository {
     public EngRuRepositoryImpl(EngRuDictValidator engRuDictValidator) {
         this.engRuDictValidator = engRuDictValidator;
         this.prop = new Properties();
-        try {
-            in = new FileInputStream(FILE_NAME);
+        try(InputStream in = new FileInputStream(FILE_NAME)) {
             prop.load(in);
             fillCacheMap();
         } catch (FileNotFoundException e) {
@@ -50,18 +48,6 @@ public class EngRuRepositoryImpl implements EngRuRepository {
                 System.out.println(map.getKey() + " - " + map.getValue());
             }
         }
-        /*for (Map.Entry<Object, Object> o : prop.entrySet()) {
-            System.out.println(o.getKey() + " - " + o.getValue());
-        }*/
-        /*if (isChanged) {
-            PrintWriter ps = new PrintWriter(System.out);
-            prop.list(ps);
-            ps.flush();
-        } else {
-            for (Map.Entry<Object, Object> o : prop.entrySet()) {
-                System.out.println(o.getKey() + " - " + o.getValue());
-            }
-        }*/
         return null;
     }
 
@@ -84,7 +70,7 @@ public class EngRuRepositoryImpl implements EngRuRepository {
             System.out.println(dataBinder.getBindingResult().getAllErrors());
             log.warn("{} is not valid data to add", s);
             return false;
-            //throw new RuntimeException("Validation Error");
+            //throw new RuntimeException("Validation Error"); - заменил на логгер
         }
 
         prop.setProperty(word.getEnglishWord(), word.getRuWord());
@@ -98,7 +84,7 @@ public class EngRuRepositoryImpl implements EngRuRepository {
     }
 
     public boolean update(String s) {
-        //сделаю позже
+        //в задании нет пункта, реализую позже
         return false;
     }
 
@@ -114,9 +100,7 @@ public class EngRuRepositoryImpl implements EngRuRepository {
     }
 
     private void fillCacheMap() {
-        for (Map.Entry<Object, Object> o : prop.entrySet()){
-            cacheMap.put(o.getKey(), o.getValue());
-        }
+        cacheMap.putAll(prop);
         log.info("Cache was refreshed");
     }
 
