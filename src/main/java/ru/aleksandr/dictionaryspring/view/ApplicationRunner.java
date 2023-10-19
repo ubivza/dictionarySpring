@@ -75,6 +75,8 @@ public class ApplicationRunner {
                     break;
                 case 9:
                     abort = false;
+                    engRuView.exitService();
+                    spanishRuView.exitService();
                     break;
                 default:
                     System.out.println("Нет такой команды, попробуйте еще раз");

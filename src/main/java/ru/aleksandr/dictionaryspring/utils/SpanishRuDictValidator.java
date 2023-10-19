@@ -10,8 +10,8 @@ public class SpanishRuDictValidator implements Validator {
     private static final String PATTERN = "[A-Z, a-z]{4}";
     private static final String SPN_FIELD_NAME = "spanishWord";
     private static final String RU_FIELD_NAME = "ruWord";
-    private static final String ERROR_MESSAGE_BLANK = "Word shouldn't be empty";
-    private static final String ERROR_CHARACTERS_LONG = "Word must be 4 characters long and should contain only latin letters";
+    private static final String ERROR_MESSAGE_BLANK = "Foreign word shouldn't be empty";
+    private static final String ERROR_CHARACTERS_LONG = "Foreign word must be 4 characters long and should contain only latin letters";
     @Override
     public boolean supports(Class<?> clazz) {
         return SpanishRuDictionaryWord.class.equals(clazz);

@@ -1,9 +1,9 @@
 package ru.aleksandr.dictionaryspring.repositories;
 
-import java.util.List;
+import java.util.Map;
 
 public interface GenericRepository<T, KEY> {
-    List<T> getAll();
+    Map<T, T> getAll();
     T getByKey(KEY key);
     boolean save(T t);
     boolean update(T t);

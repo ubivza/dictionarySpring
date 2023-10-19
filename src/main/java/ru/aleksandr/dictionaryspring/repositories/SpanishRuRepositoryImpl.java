@@ -8,42 +8,45 @@ import ru.aleksandr.dictionaryspring.models.SpanishRuDictionaryWord;
 import ru.aleksandr.dictionaryspring.utils.SpanishRuDictValidator;
 
 import java.io.*;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 @Repository
 @Slf4j
-public class SpanishRuRepositoryImpl implements SpanishRuRepository{
-    private final Properties prop;
+public class SpanishRuRepositoryImpl implements SpanishRuRepository, Cacheable {
+    private final Properties properties;
     private final String FILE_NAME = "src/main/resources/static/dictionary2.properties";
-    private static SpanishRuDictValidator spanishRuDictValidator;
+    private SpanishRuDictValidator spanishRuDictValidator;
+    private Map<String, String> cacheMap = new HashMap<>();
 
     @Autowired
     public SpanishRuRepositoryImpl(SpanishRuDictValidator spanishRuDictValidator) {
-        SpanishRuRepositoryImpl.spanishRuDictValidator = spanishRuDictValidator;
-        this.prop = new Properties();
+        this.spanishRuDictValidator = spanishRuDictValidator;
+        this.properties = new Properties();
 
         try(InputStream in = new FileInputStream(FILE_NAME)) {
-            prop.load(in);
+            properties.load(in);
+
+            cacheMap.putAll((Map) properties);
+
+            properties.clear();
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("No such properties file");
-            //чтобы программа не вылетала с ошибкой можно сделать просто логгирование +
-            //сообщением пользователю что возникла проблема
+            throw new RuntimeException("No such properties file while loading");
         } catch (IOException e) {
-            throw new RuntimeException("Something went wrong");
+            throw new RuntimeException("Something went wrong while loading properties file");
         }
     }
 
 
-    public List<String> getAll() {
-        PrintWriter ps = new PrintWriter(System.out);
-        prop.list(ps);
-        ps.flush();
-        return null;
+    public Map<String, String> getAll() {
+        return cacheMap;
     }
 
     public String getByKey(String s) {
-        return prop.getProperty(s, "Key not found, try again");
+        if (!cacheMap.containsKey(s))
+            return "Key not found, try again";
+        return cacheMap.get(s);
     }
 
     public boolean save(String s) {
@@ -53,42 +56,43 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository{
         word.setSpanishWord(valueToSave[0]);
         word.setRuWord(valueToSave[1]);
 
-        validate(word);
-
-        prop.setProperty(word.getSpanishWord(), word.getRuWord());
-        try {
-            prop.store(new FileOutputStream(FILE_NAME), null);
-        } catch (IOException e) {
-            throw new RuntimeException("No such properties file found to save");
-        }
-        return true;
-    }
-
-    public boolean update(String s) {
-        //в задании нет указаний, сделаю позже
-        return false;
-    }
-
-    public boolean deleteByKey(String s) {
-        prop.remove(s);
-        try {
-            prop.store(new FileOutputStream(FILE_NAME), null);
-        } catch (IOException e) {
-            throw new RuntimeException("No such properties file found to delete");
-        }
-        return true;
-    }
-
-    private static void validate(SpanishRuDictionaryWord spanishRuDictionaryWord) {
-        DataBinder dataBinder = new DataBinder(spanishRuDictionaryWord);
+        DataBinder dataBinder = new DataBinder(word);
         dataBinder.addValidators(spanishRuDictValidator);
         dataBinder.validate();
 
         if (dataBinder.getBindingResult().hasErrors()) {
             System.out.println(dataBinder.getBindingResult().getAllErrors());
-            log.warn("{} is not valid data to add", spanishRuDictionaryWord.getSpanishWord());
-            //throw new RuntimeException("Validation Error"); - заменил на логгер
+            log.warn("{} is not valid data to add", word.getSpanishWord());
+            return false;
+        }
+
+        cacheMap.put(word.getSpanishWord(), word.getRuWord());
+        return true;
+    }
+
+    public boolean update(String s) {
+        //в задании нет указаний, сделаю по надобности
+        return false;
+    }
+
+    public boolean deleteByKey(String s) {
+        if (cacheMap.containsKey(s)) {
+            cacheMap.remove(s);
+            log.info("{} delete", s);
+            return true;
+        } else {
+            return false;
         }
     }
 
+    public void saveCacheToMemory() {
+        try(OutputStream out = new FileOutputStream(FILE_NAME)) {
+            properties.putAll(cacheMap);
+            properties.store(out, null);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("No such properties file while saving");
+        } catch (IOException e) {
+            throw new RuntimeException("Something went wrong while saving properties file");
+        }
+    }
 }
