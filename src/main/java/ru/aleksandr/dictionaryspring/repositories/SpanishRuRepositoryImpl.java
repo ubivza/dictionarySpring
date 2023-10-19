@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.validation.DataBinder;
+import org.springframework.validation.ObjectError;
 import ru.aleksandr.dictionaryspring.models.SpanishRuDictionaryWord;
 import ru.aleksandr.dictionaryspring.utils.SpanishRuDictValidator;
 
@@ -61,8 +62,12 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository, Cacheable {
         dataBinder.validate();
 
         if (dataBinder.getBindingResult().hasErrors()) {
-            System.out.println(dataBinder.getBindingResult().getAllErrors());
-            log.warn("{} is not valid data to add", word.getSpanishWord());
+            for (ObjectError str : dataBinder.getBindingResult().getAllErrors()) {
+                System.out.println(str.getDefaultMessage());
+            }
+            System.out.println();
+            log.warn("{} is not valid data to add,\nValidation message: {}\n",
+                    s, dataBinder.getBindingResult().getAllErrors());
             return false;
         }
 
