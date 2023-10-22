@@ -30,6 +30,7 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
             properties.load(in);
 
             cacheMap.putAll((Map) properties);
+            log.info("CacheMap of first dict was filled with data from properties file");
 
             properties.clear();
         } catch (FileNotFoundException e) {
@@ -84,9 +85,9 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
     }
 
     public boolean deleteByKey(String s) {
+        log.info("Trying to delete {}", s);
         if (cacheMap.containsKey(s)) {
             cacheMap.remove(s);
-            log.info("{} delete", s);
             return true;
         } else {
             return false;
@@ -96,6 +97,7 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
     public void saveCacheToMemory() {
         try(OutputStream out = new FileOutputStream(FILE_NAME)) {
             properties.putAll(cacheMap);
+            log.info("CacheMap of first dict is pushing to properties file");
             properties.store(out, null);
         } catch (FileNotFoundException e) {
             throw new RuntimeException("No such properties file while saving");
@@ -104,10 +106,3 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
         }
     }
 }
-
-
-/*
-    TODO:
-        remake second dictionary implementation with HashMap,
-        try to rewrite validation with class that imlements Errors *
- */

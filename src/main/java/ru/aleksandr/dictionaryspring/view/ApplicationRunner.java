@@ -1,11 +1,13 @@
 package ru.aleksandr.dictionaryspring.view;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
 
 @Component
+@Slf4j
 public class ApplicationRunner {
     private static boolean abort = true;
     private EngRuView engRuView;
@@ -18,6 +20,7 @@ public class ApplicationRunner {
     }
 
     public void runApp() {
+        log.info("Application starting...");
         Scanner scanner = new Scanner(System.in);
         while (abort) {
             System.out.println("Добро пожаловать в словарьленд! Выберите действие:" + "\n");
@@ -74,6 +77,7 @@ public class ApplicationRunner {
                     spanishRuView.addWord(wordToAdd2);
                     break;
                 case 9:
+                    log.info("Application aborted...");
                     abort = false;
                     engRuView.exitService();
                     spanishRuView.exitService();
