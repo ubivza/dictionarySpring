@@ -20,6 +20,7 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository, Cacheable {
     private final String FILE_NAME = "src/main/resources/static/dictionary2.properties";
     private SpanishRuDictValidator spanishRuDictValidator;
     private Map<String, String> cacheMap = new HashMap<>();
+    private boolean isNotChanged = true;
 
     @Autowired
     public SpanishRuRepositoryImpl(SpanishRuDictValidator spanishRuDictValidator) {
@@ -73,6 +74,7 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository, Cacheable {
         }
 
         cacheMap.put(word.getSpanishWord(), word.getRuWord());
+        isNotChanged = false;
         return true;
     }
 
@@ -82,6 +84,7 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository, Cacheable {
 
         if (cacheMap.containsKey(valueToUpdate[0])) {
             cacheMap.put(valueToUpdate[0], valueToUpdate[1]);
+            isNotChanged = false;
             return true;
         }
         return false;
@@ -91,13 +94,18 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository, Cacheable {
         log.info("Trying to delete {}", s);
         if (cacheMap.containsKey(s)) {
             cacheMap.remove(s);
+            isNotChanged = false;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public void saveCacheToMemory() {
+        if (isNotChanged) {
+            log.info("There were no changes in file, cacheMap of second dict is not pushing");
+            return;
+        }
+
         try(OutputStream out = new FileOutputStream(FILE_NAME)) {
             properties.putAll(cacheMap);
             log.info("CacheMap of second dict is pushing to properties file");

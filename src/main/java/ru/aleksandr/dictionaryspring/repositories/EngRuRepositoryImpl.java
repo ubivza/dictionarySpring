@@ -20,6 +20,7 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
     private final String FILE_NAME = "src/main/resources/static/dictionary1.properties";
     private final EngRuDictValidator engRuDictValidator;
     private Map<String, String> cacheMap = new HashMap<>();
+    private boolean isNotChanged = true;
 
     @Autowired
     public EngRuRepositoryImpl(EngRuDictValidator engRuDictValidator) {
@@ -74,6 +75,7 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
         //для дубликатов, при сохранении повторного ключа можно просто сделать конкатенацию
         //value через заптую, то есть просто добавить перевод к уже существующему (если это нужно)
         cacheMap.put(word.getEnglishWord(), word.getRuWord());
+        isNotChanged = false;
         return true;
     }
 
@@ -83,6 +85,7 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
 
         if (cacheMap.containsKey(valueToUpdate[0])) {
             cacheMap.put(valueToUpdate[0], valueToUpdate[1]);
+            isNotChanged = false;
             return true;
         }
         return false;
@@ -92,13 +95,18 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
         log.info("Trying to delete {}", s);
         if (cacheMap.containsKey(s)) {
             cacheMap.remove(s);
+            isNotChanged = false;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public void saveCacheToMemory() {
+        if (isNotChanged) {
+            log.info("There were no changes in file, cacheMap of first dict is not pushing");
+            return;
+        }
+
         try(OutputStream out = new FileOutputStream(FILE_NAME)) {
             properties.putAll(cacheMap);
             log.info("CacheMap of first dict is pushing to properties file");
