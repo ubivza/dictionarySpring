@@ -3,3 +3,5 @@
 
 
 Задание 1: https://github.com/ubivza/dictionary
+
+Чтобы увидеть лог, создай локальный app.log файл в директории src/main/resources/static/<app.log>
