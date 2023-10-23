@@ -77,7 +77,13 @@ public class SpanishRuRepositoryImpl implements SpanishRuRepository, Cacheable {
     }
 
     public boolean update(String s) {
-        //в задании нет указаний, сделаю по надобности
+        log.info("Trying to update {}", s);
+        String[] valueToUpdate = s.trim().split(" - ", 2);
+
+        if (cacheMap.containsKey(valueToUpdate[0])) {
+            cacheMap.put(valueToUpdate[0], valueToUpdate[1]);
+            return true;
+        }
         return false;
     }
 

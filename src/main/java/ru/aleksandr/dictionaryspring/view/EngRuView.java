@@ -43,6 +43,14 @@ public class EngRuView {
         }
     }
 
+    public void updateWord(String wordToUpdate) {
+        if (engRuRepository.update(wordToUpdate)) {
+            System.out.println("Слово " + wordToUpdate + " успешно обновлено!" + "\n");
+        } else {
+            System.out.println("Слово " + wordToUpdate + " не было обновлено!" + "\n");
+        }
+    }
+
     public void exitService() {
         engRuRepository.saveCacheToMemory();
     }

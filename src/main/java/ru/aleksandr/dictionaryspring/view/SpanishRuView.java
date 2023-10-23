@@ -42,6 +42,14 @@ public class SpanishRuView {
         }
     }
 
+    public void updateWord(String wordToUpdate) {
+        if (spanishRuRepository.update(wordToUpdate)) {
+            System.out.println("Слово " + wordToUpdate + " успешно обновлено!" + "\n");
+        } else {
+            System.out.println("Слово " + wordToUpdate + " не было обновлено!" + "\n");
+        }
+    }
+
     public void exitService() {
         spanishRuRepository.saveCacheToMemory();
     }

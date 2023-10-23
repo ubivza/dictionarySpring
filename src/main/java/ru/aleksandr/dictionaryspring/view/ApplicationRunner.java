@@ -13,6 +13,14 @@ public class ApplicationRunner {
     private EngRuView engRuView;
     private SpanishRuView spanishRuView;
 
+    private static final String WORD_TO_FIND = "Введите слово которое хотите найти:";
+    private static final String WORD_TO_DELETE = "Введите слово которое хотите удалить:";
+    private static final String WORD_TO_ADD = "Введите слово, которое хотите добавить и его перевод через дефис:";
+    private static final String WORD_TO_UPDATE = "Введите слово, которое хотите обновить и его перевод через дефис:";
+    private static final String FORMAT_ENG_DICT = "Формат : 5 в длину и содержит только цифры";
+    private static final String FORMAT_SPAIN_DICT = "Формат : 4 в длину и содержит только латинские буквы";
+
+
     @Autowired
     public ApplicationRunner(EngRuView engRuView, SpanishRuView spanishRuView) {
         this.engRuView = engRuView;
@@ -32,7 +40,9 @@ public class ApplicationRunner {
             System.out.println("6. Удалить слово в Испано-Русском словаре");
             System.out.println("7. Добавить слово в Англо-Русский словарь");
             System.out.println("8. Добавить слово в Испано-Русский словарь");
-            System.out.println("9. Выключить приложение");
+            System.out.println("9. Обновить слово в Англо-Русском словаре");
+            System.out.println("10. Обновить слово в Испано-Русском словаре");
+            System.out.println("404. Выключить приложение");
 
             int action = scanner.nextInt();
             scanner.nextLine();
@@ -45,38 +55,50 @@ public class ApplicationRunner {
                     spanishRuView.show();
                     break;
                 case 3:
-                    System.out.println("Введите слово которое хотите найти:");
+                    System.out.println(WORD_TO_FIND);
                     String wordToFind = scanner.nextLine();
                     engRuView.showByWord(wordToFind);
                     break;
                 case 4:
-                    System.out.println("Введите слово которое хотите найти:");
+                    System.out.println(WORD_TO_FIND);
                     String wordToFind2 = scanner.nextLine();
                     spanishRuView.showByWord(wordToFind2);
                     break;
                 case 5:
-                    System.out.println("Введите слово которое хотите удалить:");
+                    System.out.println(WORD_TO_DELETE);
                     String wordTodelete = scanner.nextLine();
                     engRuView.deleteByWord(wordTodelete);
                     break;
                 case 6:
-                    System.out.println("Введите слово которое хотите удалить:");
+                    System.out.println(WORD_TO_DELETE);
                     String wordTodelete2 = scanner.nextLine();
                     spanishRuView.deleteByWord(wordTodelete2);
                     break;
                 case 7:
-                    System.out.println("Введите слово, которое хотите добавить и его перевод через дефис:");
-                    System.out.println("Формат : 5 в длину и содержит только цифры");
+                    System.out.println(WORD_TO_ADD);
+                    System.out.println(FORMAT_ENG_DICT);
                     String wordToAdd = scanner.nextLine();
                     engRuView.addWord(wordToAdd);
                     break;
                 case 8:
-                    System.out.println("Введите слово, которое хотите добавить и его перевод через дефис:");
-                    System.out.println("Формат : 4 в длину и содержит только латинские буквы");
+                    System.out.println(WORD_TO_ADD);
+                    System.out.println(FORMAT_SPAIN_DICT);
                     String wordToAdd2 = scanner.nextLine();
                     spanishRuView.addWord(wordToAdd2);
                     break;
                 case 9:
+                    System.out.println(WORD_TO_UPDATE);
+                    System.out.println(FORMAT_ENG_DICT);
+                    String wordToUpdate = scanner.nextLine();
+                    engRuView.updateWord(wordToUpdate);
+                    break;
+                case 10:
+                    System.out.println(WORD_TO_UPDATE);
+                    System.out.println(FORMAT_SPAIN_DICT);
+                    String wordToUpdate2 = scanner.nextLine();
+                    spanishRuView.updateWord(wordToUpdate2);
+                    break;
+                case 404:
                     log.info("Application aborted...");
                     abort = false;
                     engRuView.exitService();

@@ -57,7 +57,6 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
         word.setEnglishWord(valueToSave[0]);
         word.setRuWord(valueToSave[1]);
 
-        //-------------------------------------------
         DataBinder dataBinder = new DataBinder(word);
         dataBinder.addValidators(engRuDictValidator);
         dataBinder.validate();
@@ -71,7 +70,6 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
                     s, dataBinder.getBindingResult().getAllErrors());
             return false;
         }
-        //-------------------------------------------
 
         //для дубликатов, при сохранении повторного ключа можно просто сделать конкатенацию
         //value через заптую, то есть просто добавить перевод к уже существующему (если это нужно)
@@ -80,7 +78,13 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
     }
 
     public boolean update(String s) {
-        //в задании нет пункта, реализую если нужно
+        log.info("Trying to update {}", s);
+        String[] valueToUpdate = s.trim().split(" - ", 2);
+
+        if (cacheMap.containsKey(valueToUpdate[0])) {
+            cacheMap.put(valueToUpdate[0], valueToUpdate[1]);
+            return true;
+        }
         return false;
     }
 
