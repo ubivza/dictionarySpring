@@ -25,6 +25,7 @@ public class EngRuRepositoryImpl implements EngRuRepository, Cacheable{
     @Autowired
     public EngRuRepositoryImpl(EngRuDictValidator engRuDictValidator) {
         this.engRuDictValidator = engRuDictValidator;
+
         this.properties = new Properties();
 
         try(InputStream in = new FileInputStream(FILE_NAME)) {
